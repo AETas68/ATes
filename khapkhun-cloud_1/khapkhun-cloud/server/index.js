@@ -56,6 +56,7 @@ app.get('*', (req, res) => {
 });
 
 // ------------------- KHOI DONG -------------------
+// Thêm logging chi tiết hơn khi khởi tạo database để dễ debug
 initSchema()
   .then(() => {
     server.listen(PORT, () => {
@@ -63,6 +64,20 @@ initSchema()
     });
   })
   .catch((err) => {
-    console.error('❌ Lỗi khởi tạo database:', err.message);
+    // In toàn bộ lỗi (stack) để biết nguyên nhân
+    console.error('❌ Lỗi khởi tạo database:', err);
     process.exit(1);
   });
+
+// Bắt lỗi server listen hoặc lỗi runtime
+server.on('error', (err) => {
+  console.error('❌ Lỗi server:', err);
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('❌ Uncaught Exception:', err);
+});
+
+process.on('unhandledRejection', (reason) => {
+  console.error('❌ Unhandled Rejection:', reason);
+});
