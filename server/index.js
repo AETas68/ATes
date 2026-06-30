@@ -9,7 +9,7 @@ const { Server } = require('socket.io');
 
 const { pool, initSchema } = require('./db');
 const { router: authRouter } = require('./auth');
-const usersRouter = require('./users');
+const { router: usersRouter } = require('./users');
 const stateRouterFactory = require('./state');
 
 const SECRET = process.env.JWT_SECRET || 'doi-secret-nay-trong-file-.env';
