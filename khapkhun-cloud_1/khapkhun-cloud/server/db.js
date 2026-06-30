@@ -5,9 +5,12 @@ const bcrypt = require('bcryptjs');
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.DATABASE_URL && process.env.DATABASE_URL.includes('localhost')
-    ? false
-    : { rejectUnauthorized: false }
+  // Nếu DATABASE_URL tồn tại và chứa 'localhost' -> không dùng SSL (local dev)
+  // Nếu DATABASE_URL tồn tại nhưng không là localhost (ví dụ: Heroku) -> bật SSL với rejectUnauthorized:false
+  // Nếu DATABASE_URL không được cung cấp -> không bật SSL (false)
+  ssl: process.env.DATABASE_URL
+    ? (process.env.DATABASE_URL.includes('localhost') ? false : { rejectUnauthorized: false })
+    : false
 });
 
 async function initSchema() {
