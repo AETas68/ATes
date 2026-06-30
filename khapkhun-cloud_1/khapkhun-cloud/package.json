@@ -4,7 +4,9 @@
   "description": "KhapKhun - He thong quan ly quan an (multi-user, cloud)",
   "main": "server/index.js",
   "scripts": {
-    "start": "node server/index.js"
+    "start": "node server/index.js",
+    "dev": "nodemon server/index.js",
+    "test-db": "node server/db-test.js"
   },
   "dependencies": {
     "express": "^4.19.2",
