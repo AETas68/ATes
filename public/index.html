@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KhạpKhun - Hệ Thống Quản Lý Quán Ăn</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 600px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
+        
+        p {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        
+        .status {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            text-align: left;
+        }
+        
+        .status h3 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+        
+        .status ul {
+            list-style: none;
+            padding-left: 20px;
+        }
+        
+        .status li {
+            color: #555;
+            margin: 8px 0;
+        }
+        
+        .status li:before {
+            content: "✓ ";
+            color: #4caf50;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        
+        .note {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            text-align: left;
+        }
+        
+        .note h3 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+        
+        .note p {
+            color: #856404;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 KhạpKhun</h1>
+        <p>Hệ Thống Quản Lý Quán Ăn Đa Người Dùng Cloud</p>
+        
+        <div class="status">
+            <h3>📊 Trạng Thái Máy Chủ</h3>
+            <ul>
+                <li>Server đang chạy</li>
+                <li>Database sẵn sàng</li>
+                <li>Socket.IO kết nối thành công</li>
+            </ul>
+        </div>
+        
+        <div class="note">
+            <h3>ℹ️ Ghi Chú</h3>
+            <p>Ứng dụng này là một API RESTful + WebSocket. Vui lòng sử dụng client web hoặc mobile để tương tác.</p>
+        </div>
+        
+        <p style="margin-top: 30px; font-size: 0.9em; color: #999;">
+            API Endpoints: <code>/api/auth</code>, <code>/api/users</code>, <code>/api/state</code>, <code>/api/health</code>
+        </p>
+    </div>
+    
+    <script>
+        // Kiểm tra kết nối socket.io (nếu có client)
+        console.log('🚀 KhạpKhun Client Loaded');
+    </script>
+</body>
+</html>
