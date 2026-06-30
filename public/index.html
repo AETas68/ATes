@@ -1,124 +1,545 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KhạpKhun - Hệ Thống Quản Lý Quán Ăn</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .container {
-            background: white;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            text-align: center;
-            max-width: 600px;
-        }
-        
-        h1 {
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 2.5em;
-        }
-        
-        p {
-            color: #666;
-            margin-bottom: 15px;
-            line-height: 1.6;
-        }
-        
-        .status {
-            background: #e8f5e9;
-            border-left: 4px solid #4caf50;
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 4px;
-            text-align: left;
-        }
-        
-        .status h3 {
-            color: #2e7d32;
-            margin-bottom: 10px;
-        }
-        
-        .status ul {
-            list-style: none;
-            padding-left: 20px;
-        }
-        
-        .status li {
-            color: #555;
-            margin: 8px 0;
-        }
-        
-        .status li:before {
-            content: "✓ ";
-            color: #4caf50;
-            font-weight: bold;
-            margin-right: 8px;
-        }
-        
-        .note {
-            background: #fff3cd;
-            border-left: 4px solid #ffc107;
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 4px;
-            text-align: left;
-        }
-        
-        .note h3 {
-            color: #856404;
-            margin-bottom: 10px;
-        }
-        
-        .note p {
-            color: #856404;
-            margin: 0;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>🍜 KhạpKhun — Hệ Thống Quản Lý</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --teal:#1D9E75;--teal2:#158a63;--amber:#C47D10;--red:#B03030;--blue:#1A5FAB;
+  --bg:#F0EDE8;--white:#ffffff;--border:#D8D4CC;--border2:#1a1a18;
+  --text1:#1a1a18;--text2:#5f5e5a;--text3:#9a9890;
+  --green:#1D9E75;--orange:#E07B20;--purple:#6B3FA0;
+}
+body{font-family:'IBM Plex Sans',sans-serif;background:var(--bg);color:var(--text1);min-height:100vh;font-size:13px}
+.nav{display:flex;align-items:center;gap:2px;padding:8px 14px;border-bottom:2px solid var(--border2);background:var(--white);flex-wrap:wrap;position:sticky;top:0;z-index:200}
+.logo{font-size:15px;font-weight:700;margin-right:8px;letter-spacing:-0.5px;white-space:nowrap}.logo span{color:var(--teal)}
+.ver{font-size:10px;font-weight:700;background:var(--border2);color:#fff;padding:2px 7px;margin-right:8px}
+.nb{padding:6px 11px;border:2px solid transparent;background:transparent;cursor:pointer;font-size:11px;font-weight:600;font-family:inherit;transition:.1s;white-space:nowrap;color:var(--text2);border-radius:2px}
+.nb:hover{border-color:var(--border2);color:var(--text1)}.nb.on{background:var(--border2);color:#fff;border-color:var(--border2)}
+.nav-right{display:flex;align-items:center;gap:8px;margin-left:auto}
+.user-info{display:flex;align-items:center;gap:6px;font-size:11px;padding:4px 8px;border:1px solid var(--border);border-radius:2px}
+.user-role{font-weight:700;color:var(--teal)}.save-btn{padding:6px 14px;background:var(--teal);color:#fff;border:2px solid var(--teal2);cursor:pointer;font-size:11px;font-weight:700;font-family:inherit}
+.save-btn:hover{background:var(--teal2)}
+.saved-msg{font-size:11px;color:var(--teal);font-weight:700;opacity:0;transition:.4s}.saved-msg.show{opacity:1}
+.ts{font-size:10px;color:var(--text3);padding:3px 8px;border:1px solid var(--border)}
+.content{max-width:1380px;margin:0 auto;padding:16px 18px;width:100%}
+.page{display:none}.page.on{display:block}
+.card{background:var(--white);border:2px solid var(--border2);padding:14px 16px;margin-bottom:12px}
+.card-title{font-size:13px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.sec-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin:14px 0 6px;padding-bottom:4px;border-bottom:1px solid var(--border)}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:14px}
+.metric{background:var(--white);border:2px solid var(--border2);padding:12px 14px}
+.metric-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text3);margin-bottom:4px}
+.metric-val{font-size:18px;font-weight:700;font-family:'IBM Plex Mono',monospace;line-height:1.1}
+.metric-sub{font-size:10px;color:var(--text3);margin-top:2px}
+.m-good .metric-val{color:var(--teal)}.m-warn .metric-val{color:var(--amber)}.m-bad .metric-val{color:var(--red)}.m-blue .metric-val{color:var(--blue)}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{text-align:left;padding:7px 10px;font-size:10px;font-weight:700;color:var(--text3);border-bottom:2px solid var(--border2);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;background:var(--bg);position:sticky;top:0}
+td{padding:6px 10px;border-bottom:1px solid rgba(0,0,0,.06);vertical-align:middle}
+tr:hover td{background:#F7F4F0}
+.tr-total td{background:#F0EDE8;font-weight:700;border-top:2px solid var(--border2)}
+.badge{display:inline-block;padding:2px 7px;font-size:10px;font-weight:700;letter-spacing:.3px;border:1.5px solid;border-radius:1px}
+.b-green{color:var(--teal);border-color:var(--teal);background:#e8f8f2}
+.b-red{color:var(--red);border-color:var(--red);background:#fdf0f0}
+.b-amber{color:var(--amber);border-color:var(--amber);background:#fdf5e6}
+.b-gray{color:var(--text2);border-color:var(--border);background:#f5f5f3}
+.form-grid{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-group label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text2)}
+input,select,textarea{padding:7px 10px;border:1.5px solid var(--border);background:var(--white);font-family:inherit;font-size:13px;color:var(--text1);transition:.1s;width:100%}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--border2)}
+.btn{padding:7px 16px;border:2px solid;cursor:pointer;font-size:12px;font-weight:700;font-family:inherit;transition:.15s;display:inline-flex;align-items:center;gap:5px}
+.btn-primary{background:var(--border2);color:#fff;border-color:var(--border2)}.btn-primary:hover{opacity:.85}
+.btn-teal{background:var(--teal);color:#fff;border-color:var(--teal2)}.btn-teal:hover{background:var(--teal2)}
+.btn-red{background:var(--red);color:#fff;border-color:#8a2020}.btn-red:hover{opacity:.85}
+.btn-outline{background:transparent;color:var(--text1);border-color:var(--border2)}.btn-outline:hover{background:var(--border2);color:#fff}
+.btn-sm{padding:4px 10px;font-size:11px}
+.alert{padding:8px 12px;font-size:12px;font-weight:600;margin-bottom:8px;border-left:3px solid}
+.alert-warn{background:#fffbec;border-color:var(--amber);color:#7a4f00}
+.alert-danger{background:#fff0f0;border-color:var(--red);color:#7a0000}
+.alert-success{background:#edfaf4;border-color:var(--teal);color:#0a4a30}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:500;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:var(--white);border:2px solid var(--border2);padding:20px;min-width:380px;max-width:780px;width:95%;max-height:90vh;overflow-y:auto;position:relative}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid var(--border2)}
+.modal-title{font-size:14px;font-weight:700}
+.modal-close{background:none;border:none;font-size:18px;cursor:pointer;color:var(--text2);line-height:1}
+.modal-close:hover{color:var(--red)}
+.flex-center{display:flex;align-items:center;gap:8px}
+.mt8{margin-top:8px}.mt12{margin-top:12px}.mb8{margin-bottom:8px}.mb12{margin-bottom:12px}
+.txt-right{text-align:right}.txt-center{text-align:center}
+.txt-gray{color:var(--text3)}.txt-green{color:var(--teal)}.txt-red{color:var(--red)}
+.mono{font-family:'IBM Plex Mono',monospace}
+.hidden{display:none}
+.col-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.col-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.tbl-wrap{overflow-x:auto}
+.sticky-col{position:sticky;left:0;background:var(--white);z-index:1}
+tr:hover .sticky-col{background:#F7F4F0}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--text3)}
+@media(max-width:768px){
+  .nav{padding:6px 8px;gap:1px}
+  .nb{padding:5px 8px;font-size:10px}
+  .content{padding:10px}
+  .col-2,.col-3{grid-template-columns:1fr}
+  .metrics{grid-template-columns:repeat(2,1fr)}
+}
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>🚀 KhạpKhun</h1>
-        <p>Hệ Thống Quản Lý Quán Ăn Đa Người Dùng Cloud</p>
-        
-        <div class="status">
-            <h3>📊 Trạng Thái Máy Chủ</h3>
-            <ul>
-                <li>Server đang chạy</li>
-                <li>Database sẵn sàng</li>
-                <li>Socket.IO kết nối thành công</li>
-            </ul>
-        </div>
-        
-        <div class="note">
-            <h3>ℹ️ Ghi Chú</h3>
-            <p>Ứng dụng này là một API RESTful + WebSocket. Vui lòng sử dụng client web hoặc mobile để tương tác.</p>
-        </div>
-        
-        <p style="margin-top: 30px; font-size: 0.9em; color: #999;">
-            API Endpoints: <code>/api/auth</code>, <code>/api/users</code>, <code>/api/state</code>, <code>/api/health</code>
-        </p>
+
+<!-- NAV -->
+<nav class="nav">
+  <span class="logo">🍜 <span>Khạp</span>Khun</span>
+  <span class="ver">v13</span>
+  <button class="nb on" onclick="goPage('dashboard')">📊 Dashboard</button>
+  <button class="nb" onclick="goPage('banhang')" id="nb-banhang">🛒 Bán Hàng</button>
+  <button class="nb" onclick="goPage('nvl')" id="nb-nvl">📦 Danh Mục NVL</button>
+  <button class="nb" onclick="goPage('inventory')" id="nb-inventory">🚚 Nhập Hàng</button>
+  <button class="nb" onclick="goPage('menu')" id="nb-menu">🍽 Menu & Công Thức</button>
+  <button class="nb" onclick="goPage('chamcong')" id="nb-chamcong">👥 Chấm Công</button>
+  <button class="nb" onclick="goPage('chiphi')" id="nb-chiphi">💸 Chi Phí</button>
+  <button class="nb" onclick="goPage('haohut')" id="nb-haohut">📉 Hao Hụt</button>
+  <button class="nb" onclick="goPage('huyhang')" id="nb-huyhang">🗑 Hủy Hàng</button>
+  <button class="nb" onclick="goPage('tonkho')" id="nb-tonkho">🗄 Tồn Kho</button>
+  <button class="nb" onclick="goPage('baocao')" id="nb-baocao">📈 Báo Cáo</button>
+  <button class="nb" onclick="goPage('users')" id="nb-users" style="border-color:var(--red);color:var(--red)">👤 Người Dùng</button>
+  <div class="nav-right">
+    <div class="user-info">
+      <span id="user-name">—</span>
+      <span class="user-role" id="user-role">—</span>
     </div>
-    
-    <script>
-        // Kiểm tra kết nối socket.io (nếu có client)
-        console.log('🚀 KhạpKhun Client Loaded');
-    </script>
+    <span class="saved-msg" id="savedMsg">✓ Đã lưu</span>
+    <span class="ts" id="tsLabel">—</span>
+    <button class="save-btn" onclick="saveData()">💾 Lưu</button>
+    <button class="btn btn-outline btn-sm" onclick="logout()">🚪 Thoát</button>
+  </div>
+</nav>
+
+<!-- LOGIN PAGE -->
+<div id="page-login" style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%)">
+  <div class="card" style="min-width:380px;box-shadow:0 10px 25px rgba(0,0,0,0.2)">
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:32px;margin-bottom:8px">🍜</div>
+      <div style="font-size:18px;font-weight:700;color:var(--teal)">KhạpKhun</div>
+      <div style="font-size:12px;color:var(--text3);margin-top:4px">Hệ Thống Quản Lý Quán Ăn</div>
+    </div>
+    <div class="form-group mb12">
+      <label>Tên Tài Khoản</label>
+      <input id="login-username" placeholder="admin" onkeypress="if(event.key==='Enter')loginSubmit()">
+    </div>
+    <div class="form-group mb12">
+      <label>Mật Khẩu</label>
+      <input id="login-password" type="password" placeholder="••••••" onkeypress="if(event.key==='Enter')loginSubmit()">
+    </div>
+    <button class="btn btn-teal" style="width:100%;justify-content:center" onclick="loginSubmit()">🔓 Đăng Nhập</button>
+    <div id="login-error" class="alert alert-danger mt12" style="display:none"></div>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="content" id="main-content" style="display:none">
+
+<!-- DASHBOARD -->
+<div class="page on" id="page-dashboard">
+  <div class="sec-label">📊 Tổng Quan</div>
+  <div class="metrics">
+    <div class="metric m-blue"><div class="metric-label">Tình Trạng</div><div class="metric-val" id="db-status">—</div></div>
+    <div class="metric m-good"><div class="metric-label">Người Dùng</div><div class="metric-val" id="db-users">—</div></div>
+    <div class="metric"><div class="metric-label">Cập Nhật</div><div class="metric-val fs11" id="db-updated">—</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">👤 Thông Tin Người Dùng</div>
+    <div class="form-grid" style="grid-template-columns:1fr 1fr">
+      <div><div style="font-size:10px;color:var(--text3);font-weight:700">Username</div><div style="font-size:12px;font-weight:600" id="db-user-username">—</div></div>
+      <div><div style="font-size:10px;color:var(--text3);font-weight:700">Tên Đầy Đủ</div><div style="font-size:12px;font-weight:600" id="db-user-name">—</div></div>
+      <div><div style="font-size:10px;color:var(--text3);font-weight:700">Quyền</div><div style="font-size:12px;font-weight:600;color:var(--teal)" id="db-user-role">—</div></div>
+      <div><div style="font-size:10px;color:var(--text3);font-weight:700">ID</div><div style="font-size:12px;font-weight:600" id="db-user-id">—</div></div>
+    </div>
+    <button class="btn btn-outline mt12" onclick="openModal('modal-change-pass')">🔑 Đổi Mật Khẩu</button>
+  </div>
+</div>
+
+<!-- USERS (ADMIN ONLY) -->
+<div class="page" id="page-users">
+  <div class="sec-label">👤 Quản Lý Người Dùng</div>
+  <button class="btn btn-teal" onclick="openModal('modal-user-add')" style="margin-bottom:12px">➕ Thêm Người Dùng</button>
+  <div class="card">
+    <table>
+      <thead><tr>
+        <th>#</th>
+        <th>Username</th>
+        <th>Tên</th>
+        <th>Quyền</th>
+        <th>Ngày Tạo</th>
+        <th></th>
+      </tr></thead>
+      <tbody id="users-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+</div><!-- end main-content -->
+
+<!-- MODALS -->
+
+<!-- Modal: Đổi Mật Khẩu -->
+<div class="modal-bg" id="modal-change-pass">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-title">🔑 Đổi Mật Khẩu</span><button class="modal-close" onclick="closeModal('modal-change-pass')">✕</button></div>
+    <div class="form-grid">
+      <div class="form-group" style="grid-column:1/-1"><label>Mật Khẩu Hiện Tại</label><input type="password" id="cp-old" placeholder="••••••"></div>
+      <div class="form-group" style="grid-column:1/-1"><label>Mật Khẩu Mới</label><input type="password" id="cp-new" placeholder="••••••" onkeypress="if(event.key==='Enter')changePassword()"></div>
+    </div>
+    <div class="mt12 flex-center" style="justify-content:flex-end;gap:8px">
+      <button class="btn btn-outline" onclick="closeModal('modal-change-pass')">Hủy</button>
+      <button class="btn btn-teal" onclick="changePassword()">✓ Đổi</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Thêm Người Dùng -->
+<div class="modal-bg" id="modal-user-add">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-title">➕ Thêm Người Dùng Mới</span><button class="modal-close" onclick="closeModal('modal-user-add')">✕</button></div>
+    <div class="form-grid">
+      <div class="form-group" style="grid-column:1/-1"><label>Username *</label><input id="ua-username" placeholder="john_doe"></div>
+      <div class="form-group" style="grid-column:1/-1"><label>Tên Đầy Đủ *</label><input id="ua-name" placeholder="Nguyễn Văn A"></div>
+      <div class="form-group" style="grid-column:1/-1"><label>Quyền *</label>
+        <select id="ua-role">
+          <option value="admin">Admin - Quản Lý Tối Cao</option>
+          <option value="manager">Manager - Quản Lý</option>
+          <option value="supervisor">Supervisor - Giám Sát</option>
+          <option value="staff">Staff - Nhân Viên</option>
+        </select>
+      </div>
+      <div class="form-group" style="grid-column:1/-1"><label>Mật Khẩu *</label><input type="password" id="ua-password" placeholder="••••••"></div>
+    </div>
+    <div class="mt12 flex-center" style="justify-content:flex-end;gap:8px">
+      <button class="btn btn-outline" onclick="closeModal('modal-user-add')">Hủy</button>
+      <button class="btn btn-teal" onclick="addUser()">✓ Thêm</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Sửa Người Dùng -->
+<div class="modal-bg" id="modal-user-edit">
+  <div class="modal">
+    <div class="modal-hdr"><span class="modal-title">✏️ Sửa Người Dùng</span><button class="modal-close" onclick="closeModal('modal-user-edit')">✕</button></div>
+    <input type="hidden" id="ue-id">
+    <div class="form-grid">
+      <div class="form-group" style="grid-column:1/-1"><label>Username</label><input id="ue-username" readonly style="background:#f5f5f5"></div>
+      <div class="form-group" style="grid-column:1/-1"><label>Tên Đầy Đủ</label><input id="ue-name" placeholder="Nguyễn Văn A"></div>
+      <div class="form-group" style="grid-column:1/-1"><label>Quyền</label>
+        <select id="ue-role">
+          <option value="admin">Admin - Quản Lý Tối Cao</option>
+          <option value="manager">Manager - Quản Lý</option>
+          <option value="supervisor">Supervisor - Giám Sát</option>
+          <option value="staff">Staff - Nhân Viên</option>
+        </select>
+      </div>
+      <div class="form-group" style="grid-column:1/-1"><label>Mật Khẩu Mới (để trống nếu không đổi)</label><input type="password" id="ue-password" placeholder="••••••"></div>
+    </div>
+    <div class="mt12 flex-center" style="justify-content:flex-end;gap:8px">
+      <button class="btn btn-outline" onclick="closeModal('modal-user-edit')">Hủy</button>
+      <button class="btn btn-teal" onclick="editUser()">✓ Lưu</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// STATE MANAGEMENT
+// ═══════════════════════════════════════════════════════════════
+let AppState = {
+  currentUser: null,
+  token: null,
+  data: {}
+};
+
+const API_BASE = '/api';
+
+// ═══════════════════════════════════════════════════════════════
+// INITIALIZATION
+// ═══════════════════════════════════════════════════════════════
+window.addEventListener('load', () => {
+  const savedToken = localStorage.getItem('khapkhun_token');
+  const savedUser = localStorage.getItem('khapkhun_user');
+  
+  if (savedToken && savedUser) {
+    AppState.token = savedToken;
+    AppState.currentUser = JSON.parse(savedUser);
+    showMainContent();
+    loadData();
+  } else {
+    showLoginPage();
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════
+// API CALLS
+// ═══════════════════════════════════════════════════════════════
+async function apiCall(method, endpoint, body = null) {
+  const options = {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${AppState.token}`
+    }
+  };
+  
+  if (body) options.body = JSON.stringify(body);
+  
+  try {
+    const res = await fetch(API_BASE + endpoint, options);
+    if (res.status === 401 || res.status === 403) {
+      logout();
+      return null;
+    }
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'API Error');
+    return data;
+  } catch (e) {
+    console.error('API Error:', e);
+    alert('❌ ' + e.message);
+    return null;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════════════════════
+async function loginSubmit() {
+  const username = document.getElementById('login-username').value;
+  const password = document.getElementById('login-password').value;
+  
+  if (!username || !password) {
+    showLoginError('Vui lòng nhập tài khoản và mật khẩu');
+    return;
+  }
+  
+  const result = await apiCall('POST', '/auth/login', { username, password });
+  
+  if (result) {
+    AppState.token = result.token;
+    AppState.currentUser = result.user;
+    localStorage.setItem('khapkhun_token', AppState.token);
+    localStorage.setItem('khapkhun_user', JSON.stringify(AppState.currentUser));
+    showMainContent();
+    loadData();
+  } else {
+    showLoginError('Đăng nhập thất bại');
+  }
+}
+
+function logout() {
+  AppState.token = null;
+  AppState.currentUser = null;
+  localStorage.removeItem('khapkhun_token');
+  localStorage.removeItem('khapkhun_user');
+  showLoginPage();
+}
+
+function showLoginPage() {
+  document.getElementById('page-login').style.display = 'flex';
+  document.getElementById('main-content').style.display = 'none';
+}
+
+function showMainContent() {
+  document.getElementById('page-login').style.display = 'none';
+  document.getElementById('main-content').style.display = 'block';
+  updateUserInfo();
+  updateNav();
+}
+
+function showLoginError(msg) {
+  const el = document.getElementById('login-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// UI HELPERS
+// ═══════════════════════════════════════════════════════════════
+function updateUserInfo() {
+  if (!AppState.currentUser) return;
+  
+  document.getElementById('user-name').textContent = AppState.currentUser.name || '—';
+  document.getElementById('user-role').textContent = AppState.currentUser.role.toUpperCase();
+  
+  document.getElementById('db-user-username').textContent = AppState.currentUser.username;
+  document.getElementById('db-user-name').textContent = AppState.currentUser.name;
+  document.getElementById('db-user-role').textContent = AppState.currentUser.role;
+  document.getElementById('db-user-id').textContent = '#' + AppState.currentUser.id;
+}
+
+function updateNav() {
+  const role = AppState.currentUser?.role || '';
+  
+  // Ẩn/hiện buttons theo role
+  const hideFor = {
+    staff: ['nb-banhang', 'nb-nvl', 'nb-menu', 'nb-chiphi', 'nb-haohut', 'nb-tonkho', 'nb-baocao', 'nb-users'],
+    supervisor: ['nb-menu', 'nb-users'],
+    manager: ['nb-users'],
+    admin: []
+  };
+  
+  const toHide = hideFor[role] || [];
+  
+  ['nb-banhang', 'nb-nvl', 'nb-inventory', 'nb-menu', 'nb-chamcong', 'nb-chiphi', 'nb-haohut', 'nb-huyhang', 'nb-tonkho', 'nb-baocao', 'nb-users'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = toHide.includes(id) ? 'none' : 'inline-block';
+  });
+}
+
+function goPage(page) {
+  // Admin-only
+  if (page === 'users' && AppState.currentUser?.role !== 'admin') {
+    alert('❌ Chỉ Admin mới có quyền');
+    return;
+  }
+  
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.nb').forEach(b => b.classList.remove('on'));
+  
+  document.getElementById('page-' + page)?.classList.add('on');
+  event.target.classList.add('on');
+  
+  if (page === 'users') {
+    loadUsers();
+  }
+}
+
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// USERS MANAGEMENT
+// ═══════════════════════════════════════════════════════════════
+async function loadUsers() {
+  const result = await apiCall('GET', '/users');
+  if (!result) return;
+  
+  const tbody = document.getElementById('users-tbody');
+  tbody.innerHTML = '';
+  
+  result.forEach((user, idx) => {
+    const row = tbody.insertRow();
+    row.innerHTML = `
+      <td>${idx + 1}</td>
+      <td>${user.username}</td>
+      <td>${user.name}</td>
+      <td><span class="badge b-gray">${user.role}</span></td>
+      <td>${new Date(user.created_at).toLocaleDateString('vi-VN')}</td>
+      <td><button class="btn btn-sm btn-outline" onclick="editUserModal(${user.id}, '${user.username}', '${user.name}', '${user.role}')">Sửa</button></td>
+    `;
+  });
+}
+
+function editUserModal(id, username, name, role) {
+  document.getElementById('ue-id').value = id;
+  document.getElementById('ue-username').value = username;
+  document.getElementById('ue-name').value = name;
+  document.getElementById('ue-role').value = role;
+  document.getElementById('ue-password').value = '';
+  openModal('modal-user-edit');
+}
+
+async function addUser() {
+  const username = document.getElementById('ua-username').value;
+  const name = document.getElementById('ua-name').value;
+  const role = document.getElementById('ua-role').value;
+  const password = document.getElementById('ua-password').value;
+  
+  if (!username || !name || !password) {
+    alert('❌ Vui lòng điền tất cả thông tin');
+    return;
+  }
+  
+  const result = await apiCall('POST', '/users', { username, name, role, password });
+  if (result) {
+    alert('✓ Đã thêm người dùng');
+    closeModal('modal-user-add');
+    loadUsers();
+    document.getElementById('ua-username').value = '';
+    document.getElementById('ua-name').value = '';
+    document.getElementById('ua-password').value = '';
+  }
+}
+
+async function editUser() {
+  const id = document.getElementById('ue-id').value;
+  const name = document.getElementById('ue-name').value;
+  const role = document.getElementById('ue-role').value;
+  const password = document.getElementById('ue-password').value;
+  
+  const body = { name, role };
+  if (password) body.password = password;
+  
+  const result = await apiCall('PUT', `/users/${id}`, body);
+  if (result) {
+    alert('✓ Đã cập nhật');
+    closeModal('modal-user-edit');
+    loadUsers();
+  }
+}
+
+async function changePassword() {
+  const old_password = document.getElementById('cp-old').value;
+  const new_password = document.getElementById('cp-new').value;
+  
+  if (!new_password) {
+    alert('❌ Vui lòng nhập mật khẩu mới');
+    return;
+  }
+  
+  const result = await apiCall('POST', '/auth/change-password', { old_password, new_password });
+  if (result) {
+    alert('✓ Đã đổi mật khẩu');
+    closeModal('modal-change-pass');
+    document.getElementById('cp-old').value = '';
+    document.getElementById('cp-new').value = '';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DATA MANAGEMENT
+// ═══════════════════════════════════════════════════════════════
+async function loadData() {
+  const result = await apiCall('GET', '/state');
+  if (result) {
+    AppState.data = result;
+    document.getElementById('db-status').textContent = '✓ Sẵn Sàng';
+    document.getElementById('db-updated').textContent = new Date().toLocaleTimeString('vi-VN');
+  }
+}
+
+async function saveData() {
+  const result = await apiCall('POST', '/state', { data: AppState.data });
+  if (result) {
+    const el = document.getElementById('savedMsg');
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 2000);
+  }
+}
+
+// Initialize
+setTimeout(() => {
+  if (AppState.currentUser) {
+    goPage('dashboard');
+  }
+}, 100);
+</script>
 </body>
 </html>
