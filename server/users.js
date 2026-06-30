@@ -1,4 +1,5 @@
 // server/users.js
+// API quản lý người dùng + phân quyền (role-based access control)
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const { pool } = require('./db');
@@ -6,72 +7,162 @@ const { requireAuth, requireAdmin } = require('./auth');
 
 const router = express.Router();
 
-// Danh sach nguoi dung (khong tra ve mat khau)
-router.get('/', requireAuth, requireAdmin, async (req, res) => {
-  const { rows } = await pool.query(
-    'SELECT id, username, name, role, created_at FROM users ORDER BY id ASC'
-  );
-  res.json(rows);
-});
+// ═══════════════════════════════════════════════════════════════
+// ROLES & PERMISSIONS
+// ═══════════════════════════════════════════════════════════════
+const ROLES = {
+  admin: {
+    name: 'Quản Lý Tối Cao',
+    description: 'Toàn quyền hệ thống',
+    permissions: ['*']
+  },
+  manager: {
+    name: 'Quản Lý',
+    description: 'Xem tất cả trừ người dùng',
+    permissions: [
+      'view_dashboard', 'view_banhang', 'view_nvl', 'view_inventory',
+      'view_menu', 'view_chamcong', 'view_chiphi', 'view_haohut',
+      'view_huyhang', 'view_tonkho', 'view_baocao', 'view_gsheets',
+      'edit_banhang', 'edit_inventory', 'edit_chamcong', 'edit_chiphi',
+      'edit_haohut', 'edit_huyhang', 'edit_menu', 'edit_tonkho'
+    ]
+  },
+  supervisor: {
+    name: 'Giám Sát',
+    description: 'Xem tất cả trừ người dùng, menu, công thức',
+    permissions: [
+      'view_dashboard', 'view_banhang', 'view_nvl', 'view_inventory',
+      'view_chamcong', 'view_chiphi', 'view_haohut', 'view_huyhang',
+      'view_tonkho', 'view_baocao', 'view_gsheets',
+      'edit_banhang', 'edit_inventory', 'edit_chamcong', 'edit_chiphi',
+      'edit_haohut', 'edit_huyhang', 'edit_tonkho'
+    ]
+  },
+  staff: {
+    name: 'Nhân Viên',
+    description: 'Chỉ nhập liệu (nhập hàng, hủy hàng, chấm công)',
+    permissions: [
+      'view_inventory', 'view_huyhang', 'view_chamcong',
+      'edit_inventory', 'edit_huyhang', 'edit_chamcong'
+    ]
+  }
+};
 
-// Them nguoi dung moi
-router.post('/', requireAuth, requireAdmin, async (req, res) => {
-  const { username, password, name, role } = req.body;
-  if (!username || !password || !name) {
-    return res.status(400).json({ error: 'Thiếu thông tin' });
-  }
-  if (!['admin', 'staff', 'bep', 'phucvu', 'thungan'].includes(role)) {
-    return res.status(400).json({ error: 'Vai trò không hợp lệ' });
-  }
+function hasPermission(userRole, permission) {
+  const role = ROLES[userRole];
+  if (!role) return false;
+  if (role.permissions.includes('*')) return true;
+  return role.permissions.includes(permission);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// GET: Danh sách người dùng (chỉ admin)
+// ═══════════════════════════════════════════════════════════════
+router.get('/', requireAuth, requireAdmin, async (req, res) => {
   try {
-    const hash = await bcrypt.hash(password, 10);
     const { rows } = await pool.query(
-      'INSERT INTO users (username, password_hash, name, role) VALUES ($1,$2,$3,$4) RETURNING id, username, name, role',
-      [username.trim(), hash, name.trim(), role]
+      'SELECT id, username, name, role, created_at FROM users ORDER BY created_at DESC'
     );
-    res.json(rows[0]);
+    res.json(rows);
   } catch (e) {
-    if (e.code === '23505') return res.status(409).json({ error: 'Tài khoản này đã tồn tại' });
     res.status(500).json({ error: e.message });
   }
 });
 
-// Cap nhat (doi ten / vai tro / reset mat khau)
+// ═══════════════════════════════════════════════════════════════
+// POST: Tạo người dùng mới (chỉ admin)
+// ═══════════════════════════════════════════════════════════════
+router.post('/', requireAuth, requireAdmin, async (req, res) => {
+  const { username, name, role, password } = req.body;
+  if (!username || !name || !role || !password) {
+    return res.status(400).json({ error: 'Thiếu thông tin bắt buộc' });
+  }
+  if (!ROLES[role]) {
+    return res.status(400).json({ error: 'Role không hợp lệ' });
+  }
+  try {
+    const { rows: existing } = await pool.query('SELECT id FROM users WHERE username = $1', [username]);
+    if (existing.length > 0) {
+      return res.status(400).json({ error: 'Tên tài khoản đã tồn tại' });
+    }
+    const hash = await bcrypt.hash(password, 10);
+    const { rows } = await pool.query(
+      'INSERT INTO users (username, password_hash, name, role) VALUES ($1, $2, $3, $4) RETURNING id, username, name, role, created_at',
+      [username, hash, name, role]
+    );
+    res.status(201).json(rows[0]);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════
+// PUT: Cập nhật người dùng (chỉ admin)
+// ═══════════════════════════════════════════════════════════════
 router.put('/:id', requireAuth, requireAdmin, async (req, res) => {
   const { id } = req.params;
   const { name, role, password } = req.body;
   try {
-    if (name) await pool.query('UPDATE users SET name = $1 WHERE id = $2', [name, id]);
-    if (role && ['admin', 'staff', 'bep', 'phucvu', 'thungan'].includes(role)) {
-      await pool.query('UPDATE users SET role = $1 WHERE id = $2', [role, id]);
+    if (role && !ROLES[role]) {
+      return res.status(400).json({ error: 'Role không hợp lệ' });
+    }
+    let query = 'UPDATE users SET updated_at = now()';
+    const params = [];
+    let paramIndex = 1;
+    if (name) {
+      query += `, name = $${paramIndex++}`;
+      params.push(name);
+    }
+    if (role) {
+      query += `, role = $${paramIndex++}`;
+      params.push(role);
     }
     if (password) {
       const hash = await bcrypt.hash(password, 10);
-      await pool.query('UPDATE users SET password_hash = $1 WHERE id = $2', [hash, id]);
+      query += `, password_hash = $${paramIndex++}`;
+      params.push(hash);
     }
-    res.json({ message: 'Đã cập nhật' });
+    query += ` WHERE id = $${paramIndex} RETURNING id, username, name, role, created_at`;
+    params.push(id);
+    const { rows } = await pool.query(query, params);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Người dùng không tồn tại' });
+    }
+    res.json(rows[0]);
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
 });
 
-// Xoa nguoi dung
+// ═══════════════════════════════════════════════════════════════
+// DELETE: Xóa người dùng (chỉ admin)
+// ═══════════════════════════════════════════════════════════════
 router.delete('/:id', requireAuth, requireAdmin, async (req, res) => {
   const { id } = req.params;
-  if (parseInt(id, 10) === req.user.id) {
-    return res.status(400).json({ error: 'Không thể tự xoá chính mình' });
-  }
   try {
-    const { rows } = await pool.query("SELECT COUNT(*)::int AS c FROM users WHERE role = 'admin'");
-    const target = await pool.query('SELECT role FROM users WHERE id = $1', [id]);
-    if (target.rows[0]?.role === 'admin' && rows[0].c <= 1) {
-      return res.status(400).json({ error: 'Phải có ít nhất 1 tài khoản Quản lý' });
+    const { rows: allUsers } = await pool.query('SELECT COUNT(*)::int as c FROM users');
+    if (allUsers[0].c <= 1) {
+      return res.status(400).json({ error: 'Không thể xóa người dùng cuối cùng' });
     }
-    await pool.query('DELETE FROM users WHERE id = $1', [id]);
-    res.json({ message: 'Đã xoá' });
+    const { rows } = await pool.query('DELETE FROM users WHERE id = $1 RETURNING id', [id]);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Người dùng không tồn tại' });
+    }
+    res.json({ message: 'Đã xóa người dùng' });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
 });
 
-module.exports = router;
+// ═══════════════════════════════════════════════════════════════
+// GET: Thông tin role
+// ═══════════════════════════════════════════════════════════════
+router.get('/roles/info', (req, res) => {
+  res.json(ROLES);
+});
+
+module.exports = {
+  router,
+  hasPermission,
+  ROLES
+};

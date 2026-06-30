@@ -28,12 +28,14 @@ function requireAuth(req, res, next) {
 
 function requireAdmin(req, res, next) {
   if (req.user?.role !== 'admin') {
-    return res.status(403).json({ error: 'Chỉ Quản lý mới có quyền này' });
+    return res.status(403).json({ error: 'Chỉ Admin mới có quyền này' });
   }
   next();
 }
 
-// ------------------- LOGIN -------------------
+// ═══════════════════════════════════════════════════════════════
+// LOGIN
+// ═══════════════════════════════════════════════════════════════
 router.post('/login', async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) return res.status(400).json({ error: 'Thiếu tài khoản hoặc mật khẩu' });
@@ -53,7 +55,9 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// ------------------- ĐỔI MẬT KHẨU CỦA CHÍNH MÌNH -------------------
+// ═══════════════════════════════════════════════════════════════
+// ĐỔI MẬT KHẨU CỦA CHÍNH MÌNH
+// ═══════════════════════════════════════════════════════════════
 router.post('/change-password', requireAuth, async (req, res) => {
   const { old_password, new_password } = req.body;
   if (!new_password || new_password.length < 4) {
@@ -72,4 +76,4 @@ router.post('/change-password', requireAuth, async (req, res) => {
   }
 });
 
-module.exports = { router, requireAuth, requireAdmin };
+module.exports = { router, requireAuth, requireAdmin, signToken };
